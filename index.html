@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tool Phân Tích MD5 & Lịch Sử Cầu - vkhanhh v2 [THAM KHẢO]</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            background-color: #f0f2f5;
+            color: #1c1e21;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align top for longer content */
+            min-height: 100vh;
+            padding-top: 30px;
+            padding-bottom: 30px;
+        }
+        .container {
+            width: 100%;
+            max-width: 650px;
+            background: #fff;
+            padding: 30px 35px;
+            border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+            border: 1px solid #dddfe2;
+        }
+        h1 {
+            text-align: center;
+            color: #0056b3; /* Darker Blue */
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        .main-warning {
+            text-align: center;
+            color: #d93025; /* Strong Red */
+            font-weight: bold;
+            margin-bottom: 25px;
+            font-size: 1.05em;
+            border: 2px solid #d93025;
+            padding: 12px;
+            background-color: #fce8e6;
+            border-radius: 6px;
+        }
+        .main-warning strong {
+            text-decoration: underline;
+        }
+
+        /* Section Styling */
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .section h2 {
+            text-align: center;
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        /* Toggle Buttons */
+        .toggle-button {
+            display: block;
+            width: 100%;
+            background-color: #4267b2; /* Facebook Button Blue */
+            color: white;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 15px;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .toggle-button:hover {
+            background-color: #365899;
+        }
+        .toggle-button:active {
+             transform: scale(0.98);
+        }
+
+        /* Analysis Areas */
+        .analysis-section {
+            display: none; /* Initially hidden */
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #ccc;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600; /* Semi-bold */
+            color: #555;
+        }
+        input[type="text"], textarea {
+            width: calc(100% - 24px);
+            padding: 11px 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccd0d5;
+            border-radius: 6px;
+            font-size: 15px;
+            background-color: #f5f6f7;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.07);
+        }
+         textarea {
+            min-height: 60px; /* Adjust height for history input */
+            resize: vertical;
+         }
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: #4267b2;
+            box-shadow: 0 0 0 3px rgba(66, 103, 178, 0.1);
+        }
+        .analyze-button {
+            display: block;
+            width: 100%;
+            background-color: #28a745; /* Green */
+            color: white;
+            padding: 11px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 17px;
+            font-weight: bold;
+            transition: background-color 0.2s, transform 0.1s;
+            margin-top: 5px;
+        }
+        .analyze-button:hover {
+            background-color: #218838;
+        }
+         .analyze-button:active {
+             transform: scale(0.98);
+        }
+
+        /* Result Display */
+        .result {
+            margin-top: 20px;
+            padding: 18px;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            display: none;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 14.5px;
+            line-height: 1.7;
+        }
+        .result-title {
+            font-weight: bold;
+            color: #0056b3;
+            margin-bottom: 12px;
+            display: block;
+            font-size: 1.15em;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
+        .result-detail {
+             margin-bottom: 8px;
+        }
+         .result-highlight {
+            font-weight: bold;
+            background-color: #e9ecef;
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 0.95em;
+         }
+         .monospace {
+             font-family: monospace;
+             word-break: break-all; /* Break long MD5 hashes */
+         }
+         .percentage-bar {
+            background-color: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            height: 20px;
+            margin: 15px 0;
+            display: flex;
+         }
+         .percentage-tai {
+            background-color: #fa383e; /* Red */
+            height: 100%; display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 0.8em; font-weight: bold; transition: width 0.5s ease-in-out;
+         }
+         .percentage-xiu {
+            background-color: #1877f2; /* Blue */
+            height: 100%; display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 0.8em; font-weight: bold; transition: width 0.5s ease-in-out;
+         }
+        .final-percentage {
+            font-size: 1.1em; /* Slightly smaller than MD5 only version */
+            font-weight: bold;
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .final-percentage .tai { color: #fa383e; }
+        .final-percentage .xiu { color: #1877f2; }
+
+        /* History Specific Styles */
+        .history-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .stat-item span {
+            display: block;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .streak-info {
+            font-weight: bold;
+            margin-top: 10px;
+            text-align: center;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        .streak-tai { background-color: #ffebe B; color: #fa383e; border: 1px solid #fa383e; }
+        .streak-xiu { background-color: #e7f3ff; color: #1877f2; border: 1px solid #1877f2; }
+
+        /* Error and Disclaimer */
+        .error {
+            color: #d93025;
+            font-weight: bold;
+            padding: 10px;
+            background-color: #fce8e6;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+        .disclaimer {
+            margin-top: 15px;
+            font-style: italic;
+            color: #5f6368;
+            font-size: 0.9em;
+            text-align: center;
+            padding: 10px;
+            border: 1px dashed #ffc107;
+            background-color: #fff3cd;
+            border-radius: 5px;
+            line-height: 1.5;
+        }
+        .disclaimer strong {
+             color: #d93025; /* Red */
+             font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Tool Phân Tích Tổng Hợp - vkhanhh v2</h1>
+    <p class="main-warning">
+        <strong>⚠️ CẢNH BÁO NGHIÊM TRỌNG:</strong> Tool này chỉ mang tính tham khảo và thử nghiệm. Phân tích MD5 dựa trên phép đếm TÙY Ý, KHÔNG chính xác. Phân tích lịch sử chỉ nhìn về quá khứ, KHÔNG đảm bảo tương lai. <strong>TUYỆT ĐỐI KHÔNG TIN TƯỞNG KẾT QUẢ ĐỂ ĐẶT CƯỢC! RỦI RO MẤT TIỀN RẤT CAO!</strong>
+    </p>
+
+    <!-- Phần Phân Tích MD5 (Theo Phép Đếm Ký Tự) -->
+    <div class="section">
+        <h2>1. Phân Tích MD5 (Phương Pháp Đếm Chữ/Số - KHÔNG CHUẨN XÁC)</h2>
+        <button id="toggleMd5Button" class="toggle-button">Hiện/Ẩn Phân Tích MD5</button>
+        <div id="md5AnalysisSection" class="analysis-section">
+            <label for="md5Input">Dán mã MD5 (32 ký tự) vào đây:</label>
+            <input type="text" id="md5Input" placeholder="Ví dụ: a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6">
+            <button id="analyzeMd5Button" class="analyze-button">Phân Tích MD5 (Đếm Ký Tự)</button>
+            <div id="md5Result" class="result"></div>
+            <p class="disclaimer">
+                <strong>Nhắc lại Cảnh Báo MD5:</strong> Phân tích này dựa trên việc đếm số lượng chữ (gán cho TÀI) và số (gán cho XỈU) trong mã MD5. Phương pháp này <strong>HOÀN TOÀN TÙY Ý</strong>, không có cơ sở khoa học và <strong>KHÔNG thể hiện độ chính xác</strong> thực tế của game.
+            </p>
+        </div>
+    </div>
+
+    <!-- Phần Phân Tích Lịch Sử Cầu (Nhập Thủ Công) -->
+    <div class="section">
+        <h2>2. Phân Tích Lịch Sử Cầu (Nhập Thủ Công)</h2>
+        <button id="toggleHistoryButton" class="toggle-button">Hiện/Ẩn Phân Tích Lịch Sử</button>
+        <div id="historyAnalysisSection" class="analysis-section">
+            <label for="historyInput">Nhập chuỗi kết quả gần nhất (Chỉ dùng T hoặc X, không dấu cách):</label>
+            <textarea id="historyInput" placeholder="Ví dụ: TXXTTXTXTTXXTXXTTXXT..." rows="3"></textarea>
+            <button id="analyzeHistoryButton" class="analyze-button">Phân Tích Lịch Sử</button>
+            <div id="historyResult" class="result"></div>
+             <p class="disclaimer">
+                <strong>Nhắc lại Cảnh Báo Lịch Sử:</strong> Phân tích này chỉ thống kê các kết quả bạn đã nhập. Các mẫu hình ("bệt", "1-1",...) trong quá khứ <strong>KHÔNG đảm bảo</strong> sẽ tiếp diễn hay kết thúc theo dự đoán. Game có thể hoàn toàn ngẫu nhiên.
+            </p>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- Get Elements ---
+    const toggleMd5Button = document.getElementById('toggleMd5Button');
+    const md5AnalysisSection = document.getElementById('md5AnalysisSection');
+    const md5Input = document.getElementById('md5Input');
+    const analyzeMd5Button = document.getElementById('analyzeMd5Button');
+    const md5Result = document.getElementById('md5Result');
+
+    const toggleHistoryButton = document.getElementById('toggleHistoryButton');
+    const historyAnalysisSection = document.getElementById('historyAnalysisSection');
+    const historyInput = document.getElementById('historyInput');
+    const analyzeHistoryButton = document.getElementById('analyzeHistoryButton');
+    const historyResult = document.getElementById('historyResult');
+
+    // --- Toggle Visibility Functions ---
+    function setupToggle(button, section) {
+        button.addEventListener('click', () => {
+            const isHidden = section.style.display === 'none' || section.style.display === '';
+            if (isHidden) {
+                section.style.display = 'block';
+                button.textContent = button.textContent.replace('Hiện', 'Ẩn');
+                // Focus first input/textarea in the section
+                const inputElement = section.querySelector('input, textarea');
+                if (inputElement) inputElement.focus();
+            } else {
+                section.style.display = 'none';
+                button.textContent = button.textContent.replace('Ẩn', 'Hiện');
+                const resultArea = section.querySelector('.result');
+                if(resultArea) resultArea.style.display = 'none'; // Hide result too
+                const inputElement = section.querySelector('input, textarea');
+                 if (inputElement) inputElement.value = ''; // Clear input
+                if(resultArea) resultArea.innerHTML = ''; // Clear result
+            }
+        });
+    }
+
+    setupToggle(toggleMd5Button, md5AnalysisSection);
+    setupToggle(toggleHistoryButton, historyAnalysisSection);
+
+    // --- MD5 Analysis (Arbitrary Character Count) ---
+    analyzeMd5Button.addEventListener('click', () => {
+        const md5Value = md5Input.value.trim().toLowerCase();
+        md5Result.innerHTML = '';
+        md5Result.style.display = 'block';
+
+        if (md5Value.length !== 32 || !/^[a-f0-9]{32}$/.test(md5Value)) {
+            md5Result.innerHTML = '<p class="error">Lỗi: Mã MD5 không hợp lệ. Vui lòng nhập đúng 32 ký tự (0-9, a-f).</p>';
+            return;
+        }
+
+        let digitCount = 0;
+        let letterCount = 0;
+        for (const char of md5Value) {
+            if (/\d/.test(char)) digitCount++;
+            else if (/[a-f]/.test(char)) letterCount++;
+        }
+
+        const totalChars = 32;
+        // ARBITRARY ASSIGNMENT: Letters = Tài, Digits = Xỉu
+        const taiPercentage = ((letterCount / totalChars) * 100).toFixed(2);
+        const xiuPercentage = ((digitCount / totalChars) * 100).toFixed(2);
+
+        const outputHTML = `
+            <span class="result-title">Kết Quả Phân Tích MD5 (Đếm Ký Tự - Chỉ Tham Khảo)</span>
+            <p class="result-detail"><strong>Mã MD5:</strong> <span class="monospace">${md5Value}</span></p>
+            <p class="result-detail"><strong>Phương pháp (Tùy Ý):</strong> Đếm số lượng chữ (a-f) và số (0-9).</p>
+            <p class="result-detail"> - Số lượng Chữ (a-f): <span class="result-highlight">${letterCount}</span></p>
+            <p class="result-detail"> - Số lượng Số (0-9): <span class="result-highlight">${digitCount}</span></p>
+            <p style="margin-top: 15px;"><strong>Tỷ lệ % (TÙY Ý gán Chữ=Tài, Số=Xỉu - KHÔNG CHÍNH XÁC):</strong></p>
+            <div class="percentage-bar">
+                <div class="percentage-tai" style="width: ${taiPercentage}%;" title="Tỷ lệ Chữ (Gán TÀI - Demo)">${taiPercentage > 10 ? taiPercentage + '%' : ''}</div>
+                <div class="percentage-xiu" style="width: ${xiuPercentage}%;" title="Tỷ lệ Số (Gán XỈU - Demo)">${xiuPercentage > 10 ? xiuPercentage + '%' : ''}</div>
+            </div>
+            <div class="final-percentage">
+                <span class="tai">TÀI (Chữ): ${taiPercentage}%</span> / <span class="xiu">XỈU (Số): ${xiuPercentage}%</span>
+            </div>
+            <p style="margin-top:15px; font-size:0.9em; color: #d93025; text-align:center; font-weight:bold;"><i>(Cảnh báo lại: Tỷ lệ này KHÔNG phản ánh xác suất thắng thua thực tế!)</i></p>
+        `;
+        md5Result.innerHTML = outputHTML;
+    });
+
+    // --- History Analysis (Manual Input) ---
+    analyzeHistoryButton.addEventListener('click', () => {
+        const historyValue = historyInput.value.trim().toUpperCase().replace(/[^TX]/g, ''); // Keep only T and X
+        historyResult.innerHTML = '';
+        historyResult.style.display = 'block';
+
+        if (historyValue.length === 0) {
+            historyResult.innerHTML = '<p class="error">Lỗi: Chuỗi lịch sử trống hoặc không hợp lệ. Chỉ nhập T hoặc X.</p>';
+            return;
+        }
+
+        let taiCount = 0;
+        let xiuCount = 0;
+        for (const char of historyValue) {
+            if (char === 'T') taiCount++;
+            else if (char === 'X') xiuCount++;
+        }
+
+        const totalGames = historyValue.length;
+        const taiHistPercentage = totalGames > 0 ? ((taiCount / totalGames) * 100).toFixed(2) : 0;
+        const xiuHistPercentage = totalGames > 0 ? ((xiuCount / totalGames) * 100).toFixed(2) : 0;
+
+        // Streak Analysis (Bet)
+        let currentStreak = 0;
+        let streakType = '';
+        let streakClass = '';
+        if (totalGames > 0) {
+            const lastResult = historyValue.slice(-1);
+            streakType = lastResult === 'T' ? 'TÀI' : 'XỈU';
+            streakClass = lastResult === 'T' ? 'streak-tai' : 'streak-xiu';
+            for (let i = totalGames - 1; i >= 0; i--) {
+                if (historyValue[i] === lastResult) {
+                    currentStreak++;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        // Basic Pattern Info (Optional - Simple Check)
+        let patternInfo = "Không nhận diện rõ mẫu đặc biệt gần đây.";
+        if (totalGames >= 4) {
+             const last4 = historyValue.slice(-4);
+             if (last4 === 'TXTX' || last4 === 'XTXT') {
+                 patternInfo = "Gần đây có dấu hiệu cầu 1-1.";
+             } else if (last4 === 'TTXX' || last4 === 'XXTT') {
+                  patternInfo = "Gần đây có dấu hiệu cầu 2-2.";
+             }
+        }
+
+
+        const outputHTML = `
+            <span class="result-title">Kết Quả Phân Tích Lịch Sử (${totalGames} Ván Đã Nhập)</span>
+            <p class="result-detail"><strong>Chuỗi đã nhập:</strong> <span class="monospace">${historyValue.length > 100 ? historyValue.slice(0, 50) + '...' + historyValue.slice(-50) : historyValue}</span></p>
+            <div class="history-stats">
+                 <div class="stat-item">Tổng số ván:<br><span>${totalGames}</span></div>
+                 <div class="stat-item">Số lần TÀI:<br><span class="tai">${taiCount} (${taiHistPercentage}%)</span></div>
+                 <div class="stat-item">Số lần XỈU:<br><span class="xiu">${xiuCount} (${xiuHistPercentage}%)</span></div>
+            </div>
+            <p class="result-detail"><strong>Phân tích cầu "Bệt" (Streak):</strong></p>
+            ${currentStreak > 1 ?
+                `<div class="streak-info ${streakClass}">Đang có chuỗi ${streakType} - Dài ${currentStreak} ván.</div>` :
+                '<p style="text-align:center; color: #555;">Không có chuỗi (bệt) dài (>= 2 ván) ở cuối.</p>'
+            }
+             <p class="result-detail" style="margin-top: 15px;"><strong>Ghi chú mẫu cầu đơn giản:</strong> ${patternInfo}</p>
+            <p style="margin-top:20px; font-size:0.9em; color: #d93025; text-align:center; font-weight:bold;"><i>(Cảnh báo lại: Thông tin lịch sử chỉ để tham khảo, không đảm bảo kết quả ván tiếp theo!)</i></p>
+        `;
+        historyResult.innerHTML = outputHTML;
+    });
+
+    // --- Enter Key Listeners ---
+    md5Input.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            analyzeMd5Button.click();
+        }
+    });
+     historyInput.addEventListener('keypress', function(event) {
+        // Allow Enter for new lines in textarea, but maybe Ctrl+Enter to submit?
+        // For simplicity, we won't bind Enter here, user must click the button.
+        // If you want Ctrl+Enter:
+        // if (event.key === 'Enter' && event.ctrlKey) {
+        //     event.preventDefault();
+        //     analyzeHistoryButton.click();
+        // }
+    });
+
+</script>
+
+</body>
+</html>
